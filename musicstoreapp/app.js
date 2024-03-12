@@ -4,11 +4,16 @@ let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 
-
-
-
-
 let app = express();
+
+
+const { MongoClient } = require("mongodb");
+const connectionStrings = 'mongodb+srv://admin:sdi@musicstoreapp.dab4kse.mongodb.net/?retryWrites=true&w=majority&appName=musicstoreapp';
+const dbClient = new MongoClient(connectionStrings);
+//app.set('connectionStrings', url);
+
+
+
 
 let bodyParser = require('body-parser');
 app.use(bodyParser.json());
@@ -17,7 +22,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 let indexRouter = require('./routes/index');
 let usersRouter = require('./routes/users');
-require("./routes/songs.js")(app);
+require("./routes/songs.js")(app, dbClient);
 require("./routes/authors.js")(app);
 
 
@@ -49,5 +54,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
 
 module.exports = app;
