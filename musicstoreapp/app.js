@@ -5,6 +5,17 @@ let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 
 let app = express();
+
+let expressSession = require('express-session');
+app.use(expressSession({
+  secret: 'abcdefg',
+  resave: true,
+  saveUninitialized: true
+}));
+
+let crypto = require('crypto');
+app.set('clave','abcdefg');
+app.set('crypto',crypto);
 let fileUpload = require('express-fileupload');
 app.use(fileUpload({
   limits: { fileSize: 50 * 1024 * 1024 },
@@ -22,6 +33,10 @@ const dbClient = new MongoClient(connectionStrings);
 let songsRepository = require("./repositories/songsRepository.js");
 songsRepository.init(app, dbClient);
 
+const usersRepository = require("./repositories/usersRepository.js");
+usersRepository.init(app, dbClient);
+require("./routes/users.js")(app, usersRepository);
+
 
 let bodyParser = require('body-parser');
 app.use(bodyParser.json());
@@ -30,7 +45,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 let indexRouter = require('./routes/index');
-let usersRouter = require('./routes/users');
 require("./routes/songs.js")(app, songsRepository);
 require("./routes/authors.js")(app);
 
@@ -46,7 +60,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
