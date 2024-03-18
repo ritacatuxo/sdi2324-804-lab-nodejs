@@ -77,6 +77,7 @@
         </div>
 
     <h2>Canciones favoritas</h2>
+    <h3>Precio total: {{ totalPrice }}</h3>
     <div class="row">
 
         <!-- http://librosweb.es/libro/bootstrap_3/capitulo_2/tipos_de_rejillas.html -->
@@ -89,7 +90,8 @@
                     <div>Fecha: {{ favorite.date }}</div>
                     <div class="small">Título: {{ favorite.title }}</div>
                     <div class="small">Precio: {{ favorite.price }}</div>
-                <td><a href="/songs/favorites/delete/' + {{song._id}}">Eliminar de favoritos</a></td>
+                <td><a href="/songs/favorites/delete/{{favorite._id}}">Eliminar de favoritos</a></td>
+
             </div>
         </div>
         {% endfor %}

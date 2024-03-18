@@ -42,7 +42,11 @@ app.use("/songs/add",userSessionRouter);
 app.use("/publications",userSessionRouter);
 app.use("/audios/",userAudiosRouter);
 app.use("/shop/",userSessionRouter);
-app.use("/favorites", favoriteSongsRouter);
+// solamente los usuarios autenticados puedan gestionar favoritos.
+app.use("/songs/favorites", userSessionRouter);
+app.use("/songs/favorites/add/:song_id", userSessionRouter);
+app.use("/songs/favorites/delete/:song_id", userSessionRouter);
+
 
 // songs repository
 let songsRepository = require("./repositories/songsRepository.js");
@@ -57,9 +61,6 @@ require("./routes/users.js")(app, usersRepository);
 const favoriteSongsRepository = require("./repositories/favoriteSongsRepository.js");
 favoriteSongsRepository.init(app, dbClient);
 require("./routes/songs/favorites.js")(app, favoriteSongsRepository, songsRepository);
-
-
-
 
 
 let indexRouter = require('./routes/index');
