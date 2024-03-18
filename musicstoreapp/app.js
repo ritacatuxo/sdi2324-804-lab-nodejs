@@ -4,7 +4,13 @@ let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 
+
 let app = express();
+
+let bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 
 let expressSession = require('express-session');
 app.use(expressSession({
@@ -31,23 +37,28 @@ const dbClient = new MongoClient(connectionStrings);
 
 const userSessionRouter = require('./routes/userSessionRouter.js');
 const userAudiosRouter = require('./routes/userAudiosRouter');
+const favoriteSongsRouter = require('./routes/songs/favorites');
 app.use("/songs/add",userSessionRouter);
 app.use("/publications",userSessionRouter);
 app.use("/audios/",userAudiosRouter);
-app.use("/shop/",userSessionRouter)
+app.use("/shop/",userSessionRouter);
+app.use("/favorites", favoriteSongsRouter);
 
 // songs repository
 let songsRepository = require("./repositories/songsRepository.js");
 songsRepository.init(app, dbClient);
 
+// users repository
 const usersRepository = require("./repositories/usersRepository.js");
 usersRepository.init(app, dbClient);
 require("./routes/users.js")(app, usersRepository);
 
+// favorites repository
+const favoriteSongsRepository = require("./repositories/favoriteSongsRepository.js");
+favoriteSongsRepository.init(app, dbClient);
+require("./routes/songs/favorites.js")(app, favoriteSongsRepository, songsRepository);
 
-let bodyParser = require('body-parser');
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
 
 
 
@@ -79,6 +90,7 @@ app.use(function(err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
+  console.log("Error: " + err);
   // render the error page
   res.status(err.status || 500);
   res.render('error');
