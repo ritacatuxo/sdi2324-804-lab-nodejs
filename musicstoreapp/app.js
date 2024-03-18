@@ -29,6 +29,13 @@ const { MongoClient } = require("mongodb");
 const connectionStrings = 'mongodb+srv://admin:sdi@musicstoreapp.dab4kse.mongodb.net/?retryWrites=true&w=majority&appName=musicstoreapp';
 const dbClient = new MongoClient(connectionStrings);
 
+const userSessionRouter = require('./routes/userSessionRouter.js');
+const userAudiosRouter = require('./routes/userAudiosRouter');
+app.use("/songs/add",userSessionRouter);
+app.use("/publications",userSessionRouter);
+app.use("/audios/",userAudiosRouter);
+app.use("/shop/",userSessionRouter)
+
 // songs repository
 let songsRepository = require("./repositories/songsRepository.js");
 songsRepository.init(app, dbClient);

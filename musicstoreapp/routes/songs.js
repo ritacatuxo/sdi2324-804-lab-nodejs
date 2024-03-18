@@ -22,10 +22,6 @@ module.exports = function(app, songsRepository) {
 
 
     app.get('/songs/add', function (req, res) {
-        if ( req.session.user == null){
-            res.redirect("/shop");
-            return;
-        }
 
         res.render("songs/add.twig");
     });
@@ -33,10 +29,7 @@ module.exports = function(app, songsRepository) {
 
     app.post('/songs/add', function(req, res) {
 
-        if ( req.session.user == null){
-            res.redirect("/shop");
-            return;
-        }
+
 
         let song = {
             title: req.body.title,
@@ -106,6 +99,16 @@ module.exports = function(app, songsRepository) {
             res.render("shop.twig", {songs: songs});
         }).catch(error =>{
             res.send("Se ha producido un error al listar las canciones " + error)
+        });
+    })
+
+    app.get('/publications', function (req, res) {
+        let filter = {author : req.session.user};
+        let options = {sort: {title: 1}};
+        songsRepository.getSongs(filter, options).then(songs => {
+            res.render("publications.twig", {songs: songs});
+        }).catch(error => {
+            res.send("Se ha producido un error al listar las publicaciones del usuario:" + error)
         });
     })
 
