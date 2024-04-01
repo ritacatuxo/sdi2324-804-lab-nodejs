@@ -57,7 +57,8 @@ module.exports = function(app, songsRepository) {
                         })
                         .catch(error => res.send("Error al subir la portada de la canción"))
                 } else {
-                    res.send("Agregada la canción ID: " + songId)
+                    //res.send("Agregada la canción ID: " + songId)
+                    res.redirect("/publications");
                 }
             } else {
                 res.send("Error al insertar canción");
