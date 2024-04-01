@@ -55,6 +55,31 @@ module.exports = {
                     .catch(err => callbackFunction({error: err.message}));
             })
             .catch(err => callbackFunction({error: err.message}))
-    }
+    },
+
+    buySong: async function (shop) {
+        try {
+            await this.dbClient.connect();
+            const database = this.dbClient.db(this.database);
+            const purchasesCollection = database.collection('purchases');
+            const result = await purchasesCollection.insertOne(shop);
+            return result;
+        } catch (error) {
+            throw (error);
+        }
+    },
+
+    // devuelve una lista de compras en base al criterio/filtro pasado como parámetro
+    getPurchases: async function (filter, options) {
+        try {
+            await this.dbClient.connect();
+            const database = this.dbClient.db(this.database);
+            const purchasesCollection = database.collection('purchases');
+            const purchases = await purchasesCollection.find(filter, options).toArray();
+            return purchases;
+        } catch (error) {
+            throw (error);
+        }
+    },
 
 };

@@ -11,8 +11,20 @@ userAudiosRouter.use(function (req, res, next) {
         if (req.session.user && song.author == req.session.user) {
             next();
         } else {
-            res.redirect("/shop");
+            // los usuarios que han comprado la canción tamvién pueden acceder al fichero de audio
+            let filter = {user: req.session.user, song_id: new ObjectId(songId)};
+            let options = {projection: {_id: 0, song_id: 1}};
+            songsRepository.getPurchases(filter, options).then(purchasedIds => {
+                if (purchasedIds !== null && purchasedIds.length > 0) {
+                    next();
+                } else {
+                    res.redirect("/shop");
+                }
+            }).catch(error => {
+                res.redirect("/shop");
+            })
         }
+
     }).catch(error => {
         res.redirect("/shop");
     });

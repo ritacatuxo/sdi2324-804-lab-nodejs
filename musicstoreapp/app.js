@@ -40,14 +40,18 @@ const userAudiosRouter = require('./routes/userAudiosRouter');
 const favoriteSongsRouter = require('./routes/songs/favorites');
 app.use("/songs/add",userSessionRouter);
 app.use("/publications",userSessionRouter);
+app.use("/songs/buy",userSessionRouter);
+app.use("/purchases",userSessionRouter);
+app.use("/audios/",userAudiosRouter);
+app.use("/shop/",userSessionRouter);
+
 
 // para que solo el autor de la canción pueda modificar y/o eliminar sus canciones
 const userAuthorRouter = require('./routes/userAuthorRouter');
 app.use("/songs/edit",userAuthorRouter);
 app.use("/songs/delete",userAuthorRouter);
 
-app.use("/audios/",userAudiosRouter);
-app.use("/shop/",userSessionRouter);
+
 // solamente los usuarios autenticados puedan gestionar favoritos.
 app.use("/songs/favorites", userSessionRouter);
 app.use("/songs/favorites/add/:song_id", userSessionRouter);
