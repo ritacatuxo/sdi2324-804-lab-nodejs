@@ -12,7 +12,6 @@ module.exports = function(app, songsRepository) {
             "title": "Uptown Funk",
             "price": "1.1"
         }];
-
         let response = {
             seller: 'Tienda de canciones',
             songs: songs
