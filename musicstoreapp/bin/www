@@ -21,11 +21,11 @@ app.set('port', port);
  */
 
 let privateKey = fs.readFileSync(__dirname + '/certificates/alice.key', 'utf8');
-let certificate = fs.readFileSync(__dirname + '/certificates/alice.crt', 'utf8');
-let credentials = {key: privateKey, cert: certificate};
+//let certificate = fs.readFileSync(__dirname + '/certificates/alice.crt', 'utf8');
+//let credentials = {key: privateKey, cert: certificate};
 let server = http.createServer(app);
-let httpsServer = https.createServer(credentials, app);
-httpsServer.listen(4000);
+//let httpsServer = https.createServer(credentials, app);
+//httpsServer.listen(4000);
 server.listen(app.get('port'), function() {
   console.log("Servidor activo");
 })
