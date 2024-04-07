@@ -24,6 +24,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 let jwt = require('jsonwebtoken');
 app.set('jwt', jwt);
 
+let rest = require('request');
+app.set('rest', rest);
 
 let expressSession = require('express-session');
 app.use(expressSession({

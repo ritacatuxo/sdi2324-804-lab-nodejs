@@ -142,6 +142,7 @@ module.exports = function(app, songsRepository) {
         });
     })
 
+    /*
     app.get('/songs/:id', function (req, res) {
         let filter = {_id: new ObjectId(req.params.id)};
         let options = {};
@@ -172,14 +173,68 @@ module.exports = function(app, songsRepository) {
         }).catch(error => {
             res.send("Se ha producido un error al buscar la canción " + error)
         });
+    */
+
+    app.get('/songs/:id', function (req, res) {
+        let songId = new ObjectId(req.params.id);
+        let user = req.session.user;
+        let filter = {_id: songId};
+        let options = {};
+        songsRepository.findSong(filter, options).then(song => {
+
+
+
+            filter = {user: req.session.user, song_id: song._id};
+            options = {projection: {_id: 0, song_id: 1}}; // excluimos el _id y devolvemos el song_id
+
+            // 1. Obtenemos todas las compras realizadas por el usuario que hay en sesión
+            songsRepository.getPurchases(filter, options).then(purchasedIds => {
+                let canBuy;
+
+                // el usuario es autor -> no puede comprar
+                if(song.author === req.session.user)
+                    canBuy = false;
+                    // el usuario ha comprado la canción
+                //else if (purchasedIds.includes(song._id))
+                else if (purchasedIds.length > 0)
+                    canBuy = false;
+                else { // USER CAN BUY
+                    canBuy = true;
+                    let settings = {
+                        url: "https://api.currencyapi.com/v3/latest?apikey=cur_live_gOtkj0qrRqpC2e17OUnqcLQJDnuXJqmORAgv16zq&base_currency=EUR&currencies=USD",
+                        method: "get",
+                    }
+                    let rest = app.get("rest");
+                    rest(settings, function (error, response, body) {
+                        console.log("cod: " + response.statusCode + " Cuerpo :" + body);
+                        let responseObject = JSON.parse(body);
+                        let rateUSD = responseObject.data.USD.value;
+                        // nuevo campo "usd" redondeado a dos decimales
+                        let songValue = song.price / rateUSD
+                        song.usd = Math.round(songValue * 100) / 100;
+                        console.log(canBuy);
+                        res.render("songs/song.twig", {song: song, canBuy: canBuy});
+                    })
+                    return;
+                }
+
+                res.render('songs/song.twig', {
+                    song: song,
+                    canBuy: canBuy
+                })
+            })
 
 
 
 
 
+        }).catch(error => {
+            res.send("Se ha producido un error al buscar la canción " + error)
+        });
+    });
 
 
-    })
+
 
     app.get('/songs/:kind/:id', function(req, res) {
         let response = 'id: ' + req.params.id + '<br>'
