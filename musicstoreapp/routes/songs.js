@@ -212,7 +212,6 @@ module.exports = function(app, songsRepository) {
                         // nuevo campo "usd" redondeado a dos decimales
                         let songValue = song.price / rateUSD
                         song.usd = Math.round(songValue * 100) / 100;
-                        console.log(canBuy);
                         res.render("songs/song.twig", {song: song, canBuy: canBuy});
                     })
                     return;
