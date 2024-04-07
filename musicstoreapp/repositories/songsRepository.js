@@ -73,6 +73,18 @@ module.exports = {
             .catch(err => callbackFunction({error: err.message}))
     },
 
+    updateSong: async function(song, filter, options) {
+        try {
+            await this.dbClient.connect();
+            const database = this.dbClient.db(this.database);
+            const songsCollection = database.collection(this.collectionName);
+            const result = await songsCollection.updateOne(filter, {$set: song}, options);
+            return result;
+        } catch (error) {
+            throw (error);
+        }
+    },
+
     buySong: async function (shop) {
         try {
             await this.dbClient.connect();
