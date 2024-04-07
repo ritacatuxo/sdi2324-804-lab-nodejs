@@ -11,6 +11,9 @@ let bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+let jwt = require('jsonwebtoken');
+app.set('jwt', jwt);
+
 
 let expressSession = require('express-session');
 app.use(expressSession({
@@ -51,6 +54,9 @@ const userAuthorRouter = require('./routes/userAuthorRouter');
 app.use("/songs/edit",userAuthorRouter);
 app.use("/songs/delete",userAuthorRouter);
 
+const userTokenRouter = require('./routes/userTokenRouter');
+app.use("/api/v1.0/songs/", userTokenRouter);
+
 
 // solamente los usuarios autenticados puedan gestionar favoritos.
 app.use("/songs/favorites", userSessionRouter);
@@ -76,7 +82,8 @@ require("./routes/songs/favorites.js")(app, favoriteSongsRepository, songsReposi
 let indexRouter = require('./routes/index');
 require("./routes/songs.js")(app, songsRepository);
 require("./routes/authors.js")(app);
-require("./routes/api/songsAPIv1.0.js")(app, songsRepository);
+require("./routes/api/songsAPIv1.0.js")(app, songsRepository, usersRepository);
+
 
 
 
