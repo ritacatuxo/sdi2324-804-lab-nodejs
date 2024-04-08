@@ -67,16 +67,23 @@ module.exports = function (app, songsRepository, usersRepository) {
                 author: req.session.user
             }
             // Validar aquí: título, género, precio y autor.
-            songsRepository.insertSong(song, function (songId) {
-                if (songId === null) {
-                    res.status(409);
-                    res.json({error: "No se ha podido crear la canción. El recurso ya existe."});
+            validatorInsertSong(song, function (errors) {
+                if (errors !== null && errors.length > 0) {
+                    res.status(422);
+                    res.json({errors: errors})
                 } else {
-                    res.status(201);
-                    res.json({
-                        message: "Canción añadida correctamente.",
-                        _id: songId
-                    })
+                    songsRepository.insertSong(song, function (songId) {
+                        if (songId === null) {
+                            res.status(409);
+                            res.json({error: "No se ha podido crear la canción. El recurso ya existe."});
+                        } else {
+                            res.status(201);
+                            res.json({
+                                message: "Canción añadida correctamente.",
+                                _id: songId
+                            })
+                        }
+                    });
                 }
             });
         } catch (e) {
@@ -95,6 +102,17 @@ module.exports = function (app, songsRepository, usersRepository) {
             let song = {
                 author: req.session.user
             }
+
+
+            validatorEditSong(song, function (errors) {
+                if (errors !== null && errors.length > 0) {
+                    res.status(422);
+                    res.json({errors: errors})
+                } else {
+
+                }
+            })
+
             if (typeof req.body.title !== "undefined" && req.body.title !== null)
                 song.title = req.body.title;
             if (typeof req.body.kind !== "undefined" && req.body.kind !== null)
@@ -173,6 +191,69 @@ module.exports = function (app, songsRepository, usersRepository) {
         }
     });
 
+
+
+
+    function validatorInsertSong(song, callbackFunction) {
+        let errors = new Array();
+        if (song.title === null || typeof song.title === 'undefined' || song.title.trim().length == 0)
+            errors.push({
+                "value": song.title,
+                "msg": "El titulo de la canción no puede estar vacio",
+                "param": "title",
+                "location": "body"
+            })
+        if (song.kind === null || typeof song.kind === 'undefined' || song.kind.trim().length == 0)
+            errors.push({
+                "value": song.kind,
+                "msg": "el género de la canción no puede estar vacio",
+                "param": "kind",
+                "location": "body"
+            })
+        if (song.price === null || typeof song.price === 'undefined' || song.price < 0 ||
+            song.price.toString().trim().length == 0)
+            errors.push({
+                "value": song.price,
+                "msg": "El precio de la canción no puede ser negativo",
+                "param": "price",
+                "location": "body"
+            })
+        if (errors.length <= 0)
+            callbackFunction(null);
+        else
+            callbackFunction(errors);
+    }
+
+
+        function validatorUpdateSong(song, callbackFunction) {
+            let errors = new Array();
+            if (song.title === null || typeof song.title === 'undefined' || song.title.trim().length == 0)
+                errors.push({
+                    "value": song.title,
+                    "msg": "El titulo de la canción no puede estar vacio",
+                    "param": "title",
+                    "location": "body"
+                })
+            if (song.kind === null || typeof song.kind === 'undefined' || song.kind.trim().length == 0)
+                errors.push({
+                    "value": song.kind,
+                    "msg": "el género de la canción no puede estar vacio",
+                    "param": "kind",
+                    "location": "body"
+                })
+            if (song.price === null || typeof song.price === 'undefined' || song.price < 0 ||
+                song.price.toString().trim().length == 0)
+                errors.push({
+                    "value": song.price,
+                    "msg": "El precio de la canción no puede ser negativo",
+                    "param": "price",
+                    "location": "body"
+                })
+            if (errors.length <= 0)
+                callbackFunction(null);
+            else
+                callbackFunction(errors);
+        }
 
 }
 
